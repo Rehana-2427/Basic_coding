@@ -20,7 +20,7 @@ class Swap{
 				System.out.println(Arrays.toString(a) + " ....." + Arrays.toString(b));
 				int tempArray[] = a;
 				a = b;
-				b = tempArray;
+				b = tempArrayc;
 				System.out.println("After swapping");
 				System.out.println(Arrays.toString(a) + " ....." + Arrays.toString(b));
 				
