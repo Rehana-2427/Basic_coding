@@ -1,0 +1,257 @@
+Very basic: 
+Method 1 : 
+print elements in reverse order
+
+// prints elements in reverse, original array unchanged using loop
+
+public static void printReverse(int[] arr) {
+    for (int i = arr.length - 1; i >= 0; i--) {
+        System.out.print(arr[i] + " ");
+    }
+    System.out.println();
+}
+Input: [1,2,3,4,5]
+Output: 5 4 3 2 1
+Time: O(n) | Space: O(1) (no additional array)
+
+When to use: when you only need reversed output, not the reversed array.
+
+
+Method 2 : 
+Create a new array and fill it in reverse order (safe & simple)
+
+Idea: allocate a new array rev, copy elements from last to first.
+
+public static int[] reverseNewArray(int[] arr) {
+    int n = arr.length;
+    int[] rev = new int[n];
+    for (int i = 0; i < n; i++) {
+        rev[i] = arr[n - 1 - i];
+    }
+    return rev;
+}
+
+Input: [1,2,3,4,5]
+Output (rev): [5,4,3,2,1] (original unchanged)
+Time: O(n) | Space: O(n)
+
+Pros: simple, easy to reason about.
+Cons: uses extra memory (not in-place).
+
+
+
+Method 3 :In-place reversal using a for loop swapping (half iterations)
+
+Idea: swap elements i and n-1-i for i from 0 to n/2 
+
+public static int[] reverseInPlaceFor(int[] arr) {
+    int n = arr.length;
+    for (int i = 0; i < n / 2; i++) {
+        int temp = arr[i];
+        arr[i] = arr[n - 1 - i];
+        arr[n - 1 - i] = temp;
+    }
+    return arr;
+}
+Input: [1,2,3,4,5]
+After call: [5,4,3,2,1]
+Time: O(n) | Space: O(1)
+
+Pros: in-place, simple, no extra array.
+Cons: index expression n-1-i repeated (minor).
+.......
+
+Method 4 : Recursion
+Idea: swap start and end, recurse for (start+1, end-1).
+
+public static void reverseRecursion(int[] arr, int start, int end) {
+    if (start >= end) return;
+    int temp = arr[start];
+    arr[start] = arr[end];
+    arr[end] = temp;
+    reverseRecursion(arr, start + 1, end - 1);
+}
+
+Usage: reverseRecursion(arr, 0, arr.length - 1);
+Time: O(n) | Space: O(n) stack (worst-case recursion depth n/2)
+
+Pros: nice to show algorithmic thinking.
+Cons: risk of stack overflow for large arrays, function call overhead.
+
+
+Method 5 : No-temp swaps (XOR or add/sub) — clever but not recommended for readability
+
+XOR swap (works for integers):
+
+public static int[] reverseXor(int[] arr) {
+    int start = 0, end = arr.length - 1;
+    while (start < end) {
+        arr[start] = arr[start] ^ arr[end];
+        arr[end]   = arr[start] ^ arr[end];
+        arr[start] = arr[start] ^ arr[end];
+        start++; end--;
+    }
+    return arr;
+}
+
+Pros: avoids temporary variable (interview trick).
+Cons: harder to read, only for numeric primitive types, can be bug-prone if you make mistakes.
+
+Add-subtract swap (unsafe if overflow possible): same idea but can overflow → avoid.
+
+
+MEthod 6 : TWO - POINTER 
+(in-place, using temp variable)
+
+This is essentially the most readable & efficient blend: two indices (start, end), swap using temp, move pointers inward. 
+It’s what you wrote originally, and it’s the recommended production solution.
+
+public static int[] reverseTwoPointer(int[] arr) {
+    int start = 0;
+    int end = arr.length - 1;
+    while (start < end) {
+        int temp = arr[start];
+        arr[start] = arr[end];
+        arr[end] = temp;
+        start++;
+        end--;
+    }
+    return arr;
+}
+Input: [1,2,3,4,5]
+After: [5,4,3,2,1]
+Time: O(n) | Space: O(1)
+
+Why this is best in practice:
+
+In-place (no extra memory).
+
+Linear time and constant extra space.
+
+Very readable and safe (no overflow, works with any element type).
+
+Minimal operations: swaps exactly n/2 pairs.
+
+Avoids recursion depth and extra allocation.
+
+
+| Method       | Time | Extra Space | Readability | Notes                           |
+| ------------ | ---- | ----------- | ----------- | ------------------------------- |
+| printReverse | O(n) | O(1)        | High        | Only prints reversed elements   |
+| new array    | O(n) | O(n)        | High        | Original unchanged, uses memory |
+| in-place for | O(n) | O(1)        | High        | Good                            |
+| recursion    | O(n) | O(n) stack  | Medium      | Risk of stack overflow          |
+| XOR swap     | O(n) | O(1)        | Low         | Clever but obscure              |
+| two-pointer  | O(n) | O(1)        | High        | **Recommended**                 |
+
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class ReverseDemo {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter size of array: ");
+        int n = sc.nextInt();
+        int[] arr = new int[n];
+        System.out.print("Enter elements: ");
+        for (int i = 0; i < n; i++) arr[i] = sc.nextInt();
+
+        System.out.println("Original: " + Arrays.toString(arr));
+
+        // 1) printReverse (no change)
+        System.out.print("printReverse output: ");
+        printReverse(arr);
+
+        // 2) new array
+        int[] revNew = reverseNewArray(arr);
+        System.out.println("reverseNewArray (orig unchanged): " + Arrays.toString(revNew));
+        System.out.println("Original after reverseNewArray: " + Arrays.toString(arr));
+
+        // 3) in-place for loop (make a copy first to demonstrate separately)
+        int[] arrFor = Arrays.copyOf(arr, arr.length);
+        reverseInPlaceFor(arrFor);
+        System.out.println("reverseInPlaceFor (in-place): " + Arrays.toString(arrFor));
+
+        // 4) recursion
+        int[] arrRec = Arrays.copyOf(arr, arr.length);
+        reverseRecursion(arrRec, 0, arrRec.length - 1);
+        System.out.println("reverseRecursion (in-place): " + Arrays.toString(arrRec));
+
+        // 5) xor swap
+        int[] arrXor = Arrays.copyOf(arr, arr.length);
+        reverseXor(arrXor);
+        System.out.println("reverseXor (in-place): " + Arrays.toString(arrXor));
+
+        // 6) two-pointer (recommended)
+        int[] arrTwo = Arrays.copyOf(arr, arr.length);
+        reverseTwoPointer(arrTwo);
+        System.out.println("reverseTwoPointer (recommended): " + Arrays.toString(arrTwo));
+    }
+
+    public static void printReverse(int[] arr) {
+        for (int i = arr.length - 1; i >= 0; i--) System.out.print(arr[i] + " ");
+        System.out.println();
+    }
+
+    public static int[] reverseNewArray(int[] arr) {
+        int n = arr.length;
+        int[] rev = new int[n];
+        for (int i = 0; i < n; i++) rev[i] = arr[n - 1 - i];
+        return rev;
+    }
+
+    public static int[] reverseInPlaceFor(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n / 2; i++) {
+            int temp = arr[i];
+            arr[i] = arr[n - 1 - i];
+            arr[n - 1 - i] = temp;
+        }
+        return arr;
+    }
+
+    public static void reverseRecursion(int[] arr, int start, int end) {
+        if (start >= end) return;
+        int temp = arr[start];
+        arr[start] = arr[end];
+        arr[end] = temp;
+        reverseRecursion(arr, start + 1, end - 1);
+    }
+
+    public static int[] reverseXor(int[] arr) {
+        int start = 0, end = arr.length - 1;
+        while (start < end) {
+            arr[start] = arr[start] ^ arr[end];
+            arr[end] = arr[start] ^ arr[end];
+            arr[start] = arr[start] ^ arr[end];
+            start++; end--;
+        }
+        return arr;
+    }
+
+    public static int[] reverseTwoPointer(int[] arr) {
+        int start = 0, end = arr.length - 1;
+        while (start < end) {
+            int temp = arr[start];
+            arr[start] = arr[end];
+            arr[end] = temp;
+            start++; end--;
+        }
+        return arr;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
